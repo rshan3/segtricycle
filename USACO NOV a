@@ -1,0 +1,124 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <string>
+#include <cmath>
+#include <vector>
+#include <queue>
+#include <stack>
+#define MAXN 55
+#define Eps 1e-8
+
+using namespace std;
+typedef long long ll;
+
+char G[MAXN][MAXN];
+vector<int> X[3];
+vector<int> Y[3];
+int n,m;
+int cnt,ans;
+
+int my_abs(int k){
+	return k>=0?k:-k;
+}
+
+void dfs(int a,int b){
+	G[a][b]=char('0'+cnt);
+	X[cnt].push_back(a);
+	Y[cnt].push_back(b);
+	if(a-1>=0 && G[a-1][b]=='X') dfs(a-1,b);
+	if(b+1<m && G[a][b+1]=='X') dfs(a,b+1);
+	if(a+1<n && G[a+1][b]=='X') dfs(a+1,b);
+	if(b-1>=0 && G[a][b-1]=='X') dfs(a,b-1);
+
+}
+
+void precess(){
+	cnt=0;
+	for(int i=0;i<n;i++){
+		for(int j=0;j<m;j++){
+			if(G[i][j]=='X') {dfs(i,j);cnt++;}
+		}
+
+	}
+
+
+}
+
+void check1(int x,int y){
+		int tmp=1;
+		int stp;
+		int dis;
+		for(int i=0;i<3;i++){
+			stp=10000000;
+			for(int j=0;j<X[i].size();j++){
+				dis=my_abs(x-X[i][j])+my_abs(y-Y[i][j])-1;
+				stp=min(stp,dis);
+			}
+			tmp+=stp;
+		}
+
+		ans=min(ans,tmp);
+}
+
+int check2(int a,int b){
+		int ret=10000000;
+		int dis;
+		for(int i=0;i<X[a].size();i++){
+			for(int j=0;j<X[b].size();j++){
+				dis=my_abs(X[a][i]-X[b][j])+my_abs(Y[a][i]-Y[b][j]);
+				ret=min(ret,dis-1);
+			}
+		}
+		return ret;
+}
+
+
+
+void solve(){
+		ans=10000000;
+		for(int i=0;i<n;i++){
+			for(int j=0;j<m;j++){
+				if(G[i][j]=='.') {check1(i,j);}
+			}
+		}
+
+
+		int tmp;
+		for(int i=0;i<3;i++){
+			tmp=0;
+			for(int j=0;j<3;j++){
+				if(j!=i){
+					tmp+=check2(i,j);
+				}
+			}
+			ans=min(tmp,ans);
+		}
+
+}
+
+void read(){
+	memset(G,0,sizeof(G));
+	for(int i=0;i<3;i++) X[i].clear();
+	for(int i=0;i<3;i++) Y[i].clear();
+	
+	for(int i=0;i<n;i++){
+		for(int j=0;j<m;j++){
+					cin >> G[i][j];
+				}
+			}
+
+	}
+
+
+
+int main(){
+	freopen("pageant.in","r",stdin);
+	freopen("out.txt","w",stdout);
+	while(cin >> n >> m){
+		read();
+		precess();
+		solve();
+		cout << ans <<endl;}
+	return 0;
+}
